@@ -171,12 +171,41 @@
             const randomIndex = Math.floor(Math.random() * phrases.length);
             const selectedPhrase = phrases[randomIndex];
 
-            // Update text
+            // Update visible text
             const captionElement = document.getElementById('random-caption');
-            captionElement.innerText = selectedPhrase;
+            if (captionElement) {
+                captionElement.innerText = selectedPhrase;
+            }
 
-            // Update title
+            // Update document title
             document.title = selectedPhrase;
+
+            // Update meta tags
+            const metaUpdates = {
+                'description': selectedPhrase,
+                'og:title': selectedPhrase,
+                'og:description': selectedPhrase
+            };
+
+            // Update or create meta tags
+            for (const [key, value] of Object.entries(metaUpdates)) {
+                // Check for property (og:*) or name (description)
+                let meta = document.querySelector(`meta[property="${key}"]`) || document.querySelector(`meta[name="${key}"]`);
+
+                if (meta) {
+                    meta.setAttribute('content', value);
+                } else {
+                    // Create if missing (like standard description might be)
+                    meta = document.createElement('meta');
+                    if (key.startsWith('og:')) {
+                        meta.setAttribute('property', key);
+                    } else {
+                        meta.setAttribute('name', key);
+                    }
+                    meta.setAttribute('content', value);
+                    document.head.appendChild(meta);
+                }
+            }
         }
 
         // Run on load
